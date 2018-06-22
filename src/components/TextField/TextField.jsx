@@ -176,6 +176,7 @@ class TextField extends Component {
         return (
             <div className='textfield'>
                 <input
+                    placeholder='Add address'
                     className='input'
                     type='text'
                     value={input}
