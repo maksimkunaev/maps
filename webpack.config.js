@@ -6,10 +6,11 @@ const modulesPath = path.resolve(__dirname, './node_modules');
 const autoprefixer = require('autoprefixer')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const devMode = process.env.NODE_ENV !== 'production'
+require("babel-polyfill");
 
 module.exports = {
     devtool: 'source-map',
-    entry: './src/index.js',
+    entry: ['babel-polyfill', './src/index.js'],
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'index_bundle.js',

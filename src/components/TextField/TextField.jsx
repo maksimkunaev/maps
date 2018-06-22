@@ -46,7 +46,7 @@ class TextField extends Component {
         const { points, input } = this.state;
 
         const adress = await this.geocode(input);
-
+        // console.log(adress)
         let routes = [adress, ...points];
 
         this.setState({
@@ -59,10 +59,13 @@ class TextField extends Component {
     }
 
 
-    geocode(value) {
+    async geocode(value) {
+
+        let adress;
 
         let { myMap } = this.props;
-         ymaps.geocode(value, {
+
+         await ymaps.geocode(value, {
                 results: 1
             }).then(function (res) {
 
@@ -77,7 +80,10 @@ class TextField extends Component {
                 myMap.setBounds(bounds, {
                     checkZoomRange: true
                 });
+                adress = firstGeoObject.properties.get('name');
         });
+        // console.log(adress);
+        return adress;
     }
 
     addRoutes(points) {

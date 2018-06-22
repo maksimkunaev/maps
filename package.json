@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "autoprefixer": "^8.6.3",
+    "babel-polyfill": "^6.26.0",
     "classnames": "^2.2.6",
     "debounce": "^1.1.0",
     "decko": "^1.2.0",
