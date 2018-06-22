@@ -26,10 +26,10 @@ class App extends Component {
         }, {
             searchControlProvider: 'yandex#search'
         });
-        console.log(myMap);
         this.setState({
             loaded: true
         })
+
     }
 
     render() {

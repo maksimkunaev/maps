@@ -39,12 +39,15 @@ class TextField extends Component {
         })
     }
 
-    @bind
-    onKeyPress(e) {
+
+    async onKeyPress(e) {
         if (e.keyCode !== 13 || !this.state.input) return;
 
         const { points, input } = this.state;
-        let routes = [input, ...points];
+
+        const adress = await this.geocode(input);
+
+        let routes = [adress, ...points];
 
         this.setState({
             points: routes,
@@ -53,27 +56,28 @@ class TextField extends Component {
                 // this.addRoutes(routes);
                 this.setReferencePoints(routes);
         });
-        // this.geocode(input);
     }
 
 
     geocode(value) {
-        // let { myMap } = this.props;
-        //  ymaps.geocode('Нижний Новгород', {
-        //         results: 1
-        //     }).then(function (res) {
-        //         let firstGeoObject = res.geoObjects.get(0),
-        //         coords = firstGeoObject.geometry.getCoordinates(),
-        //         bounds = firstGeoObject.properties.get('boundedBy');
 
-        //         firstGeoObject.options.set('preset', 'islands#darkBlueDotIconWithCaption');
-        //         firstGeoObject.properties.set('iconCaption', firstGeoObject.getAddressLine());
+        let { myMap } = this.props;
+         ymaps.geocode(value, {
+                results: 1
+            }).then(function (res) {
 
-        //         myMap.geoObjects.add(firstGeoObject);
-        //         myMap.setBounds(bounds, {
-        //             checkZoomRange: true
-        //         });
-        // });
+                let firstGeoObject = res.geoObjects.get(0),
+                coords = firstGeoObject.geometry.getCoordinates(),
+                bounds = firstGeoObject.properties.get('boundedBy');
+
+                firstGeoObject.options.set('preset', 'islands#darkBlueDotIconWithCaption');
+                firstGeoObject.properties.set('iconCaption', firstGeoObject.getAddressLine());
+
+                myMap.geoObjects.add(firstGeoObject);
+                myMap.setBounds(bounds, {
+                    checkZoomRange: true
+                });
+        });
     }
 
     addRoutes(points) {
@@ -95,10 +99,75 @@ class TextField extends Component {
 
     @bind
     setReferencePoints(points) {
-        console.log(points)
         if (points.length > 1) {
             multiRoute.model.setReferencePoints(points);
         }
+    }
+
+    @bind
+    onDragAndDrop(e) {
+        let li = e.target;
+
+        if (li.className === 'del' || li.className === 'img') return;
+
+        let coords = this.getCoords(li);
+        let shiftX = e.pageX - coords.left;
+        let shiftY = e.pageY - coords.top;
+
+        li.style.position = 'absolute';
+        // document.body.appendChild(li);
+        moveAt(e, true);
+
+        li.style.zIndex = 1000; // над другими элементами
+
+        function moveAt(e, first) {
+            if (first) li.style.left = e.pageX - shiftX + 'px';
+            li.style.top = e.pageY - shiftY + 'px';
+        }
+
+        document.onmousemove = e => {
+            moveAt(e);
+        };
+
+
+        document.onmouseup = e => {
+
+            li.style.display = 'none';
+            let elem = document.elementFromPoint(e.clientX, e.clientY);
+            let closestLi = elem.closest('li')
+
+            li.style.position = 'static';
+
+            li.style.display = '';
+
+            if (closestLi) {
+                let i = li.getAttribute('data-id');
+                let attr = closestLi.getAttribute('data-id');
+                let { points: routes } = this.state;
+                //меняем элементы массива местами
+                routes[attr] = routes.splice(i, 1, routes[attr])[0];
+                this.setState({
+                    points: routes
+                })
+                this.setReferencePoints(routes)
+            }
+
+            document.onmousemove = null;
+            document.onmouseup = null;
+        };
+
+        li.ondragstart = () => {
+          return false;
+        };
+
+    }
+
+    getCoords(elem) {
+      let box = elem.getBoundingClientRect();
+      return {
+        top: box.top + pageYOffset,
+        left: box.left + pageXOffset
+      };
     }
 
     render() {
@@ -106,10 +175,10 @@ class TextField extends Component {
 
         return (
             <div className='textfield'>
-                <input type='text' value={input} onChange={this.onInputChange} onKeyDown={this.onKeyPress}/>
+                <input type='text' value={input} onChange={this.onInputChange} onKeyDown={this.onKeyPress.bind(this)}/>
                 <ul>
 
-                    {points.map((item, i) => <li key={i} className='li'>
+                    {points.map((item, i) => <li key={i} data-id={i} className='li' onMouseDown={this.onDragAndDrop}>
                         <div className='text'>{item}</div>
                         <div className='del'
                             onClick={this.deletePoint.bind(this, i)}>
