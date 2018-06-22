@@ -1,30 +1,44 @@
 import React, { Component } from 'react';
 import './App.styl';
 import { bind } from 'decko';
+import Map from '../Map/Map.jsx';
+import TextField from '../TextField/TextField.jsx';
+
+let myMap;
 
 class App extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
-            open: true
+           loaded: false
         }
     }
 
+    componentDidMount() {
+        ymaps.ready(this.makeMap);
+    }
+
     @bind
-    onBtnClick() {
+    makeMap() {
+        myMap = new ymaps.Map('map', {
+            center: [55.76, 37.64],
+            zoom: 10
+        }, {
+            searchControlProvider: 'yandex#search'
+        });
+        console.log(myMap);
         this.setState({
-            open: !this.state.open
+            loaded: true
         })
     }
 
     render() {
-        let { open } = this.state;
+        const { loaded } = this.state;
 
         return (
             <div className='App'>
-               {open ? 'Hello' : 'Clicked'}
-               <button onClick={this.onBtnClick}>click</button>
+                {loaded ? <TextField myMap={myMap} /> : null}
+                <Map />
             </div>
         )
     }
