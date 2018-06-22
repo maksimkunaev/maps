@@ -44,9 +44,8 @@ class TextField extends Component {
         if (e.keyCode !== 13 || !this.state.input) return;
 
         const { points, input } = this.state;
-
         const adress = await this.geocode(input);
-        // console.log(adress)
+
         let routes = [adress, ...points];
 
         this.setState({
@@ -60,16 +59,14 @@ class TextField extends Component {
 
 
     async geocode(value) {
-
-        let adress;
-
         let { myMap } = this.props;
+        let adress;
 
          await ymaps.geocode(value, {
                 results: 1
             }).then(function (res) {
-
                 let firstGeoObject = res.geoObjects.get(0),
+
                 coords = firstGeoObject.geometry.getCoordinates(),
                 bounds = firstGeoObject.properties.get('boundedBy');
 
@@ -82,14 +79,13 @@ class TextField extends Component {
                 });
                 adress = firstGeoObject.properties.get('name');
         });
-        // console.log(adress);
         return adress;
     }
 
     addRoutes(points) {
-        if (points.length !== 2) return;
-
         let { myMap } = this.props;
+
+        if (points.length !== 2) return;
 
         multiRoute = new ymaps.multiRouter.MultiRoute({
             referencePoints: points,
@@ -121,10 +117,9 @@ class TextField extends Component {
         let shiftY = e.pageY - coords.top;
 
         li.style.position = 'absolute';
-        // document.body.appendChild(li);
         moveAt(e, true);
 
-        li.style.zIndex = 1000; // над другими элементами
+        li.style.zIndex = 1000;
 
         function moveAt(e, first) {
             if (first) li.style.left = e.pageX - shiftX + 'px';
@@ -137,19 +132,19 @@ class TextField extends Component {
 
 
         document.onmouseup = e => {
-
             li.style.display = 'none';
+
             let elem = document.elementFromPoint(e.clientX, e.clientY);
             let closestLi = elem.closest('li')
 
-            li.style.position = 'static';
-
+            li.style.position = '';
             li.style.display = '';
 
             if (closestLi) {
                 let i = li.getAttribute('data-id');
                 let attr = closestLi.getAttribute('data-id');
                 let { points: routes } = this.state;
+
                 //меняем элементы массива местами
                 routes[attr] = routes.splice(i, 1, routes[attr])[0];
                 this.setState({
@@ -157,7 +152,6 @@ class TextField extends Component {
                 })
                 this.setReferencePoints(routes)
             }
-
             document.onmousemove = null;
             document.onmouseup = null;
         };
@@ -181,19 +175,27 @@ class TextField extends Component {
 
         return (
             <div className='textfield'>
-                <input type='text' value={input} onChange={this.onInputChange} onKeyDown={this.onKeyPress.bind(this)}/>
-                <ul>
-
-                    {points.map((item, i) => <li key={i} data-id={i} className='li' onMouseDown={this.onDragAndDrop}>
-                        <div className='text'>{item}</div>
-                        <div className='del'
-                            onClick={this.deletePoint.bind(this, i)}>
+                <input
+                    className='input'
+                    type='text'
+                    value={input}
+                    onChange={this.onInputChange}
+                    onKeyDown={this.onKeyPress.bind(this)}/>
+                    <ul className='list'>
+                        {points.map((item, i) => <li
+                            key={i}
+                            data-id={i}
+                            className='li'
+                            onMouseDown={this.onDragAndDrop}>
+                            <div className='text'>{item}</div>
+                            <div className='del'
+                                onClick={this.deletePoint.bind(this, i)}>
                                 <img
                                     className='img'
                                     src={`./image/delete.png`}
                                     alt="delete" /></div>
-                    </li>)}
-                </ul>
+                        </li>)}
+                    </ul>
             </div>
         )
     }

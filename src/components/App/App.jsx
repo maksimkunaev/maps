@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.styl';
 import { bind } from 'decko';
-import Map from '../Map/Map.jsx';
+// import Map from '../Map/Map.jsx';
 import TextField from '../TextField/TextField.jsx';
 
 let myMap;
@@ -38,7 +38,7 @@ class App extends Component {
         return (
             <div className='App'>
                 {loaded ? <TextField myMap={myMap} /> : null}
-                <Map />
+                <div id='map'></div>
             </div>
         )
     }
