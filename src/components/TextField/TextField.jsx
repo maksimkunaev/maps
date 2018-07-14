@@ -5,7 +5,6 @@ import { bind } from 'decko';
 let multiRoute;
 
 class TextField extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -16,7 +15,6 @@ class TextField extends Component {
 
     componentDidMount() {
         const { points } = this.state;
-
         ymaps.ready(this.addRoutes.bind(this, points));
     }
 
@@ -28,7 +26,6 @@ class TextField extends Component {
         this.setState({
             points: routes
         })
-
         this.setReferencePoints(routes);
     }
 
@@ -60,7 +57,7 @@ class TextField extends Component {
         let { myMap } = this.props;
         let adress;
 
-         await ymaps.geocode(value, {
+        await ymaps.geocode(value, {
                 results: 1
             }).then(function (res) {
                 let firstGeoObject = res.geoObjects.get(0),
@@ -93,7 +90,6 @@ class TextField extends Component {
         }, {
             boundsAutoApply: true
         });
-
         myMap.geoObjects.add(multiRoute);
     }
 
@@ -157,7 +153,6 @@ class TextField extends Component {
         li.ondragstart = () => {
           return false;
         };
-
     }
 
     getCoords(elem) {
