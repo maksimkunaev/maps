@@ -52,11 +52,9 @@ class TextField extends Component {
             points: routes,
             input: ''
         }, () => {
-                // this.addRoutes(routes);
                 this.setReferencePoints(routes);
         });
     }
-
 
     async geocode(value) {
         let { myMap } = this.props;
